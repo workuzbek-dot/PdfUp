@@ -61,6 +61,12 @@ body{padding:14px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Se
 #wt{flex:1;text-align:center;font-weight:600;font-size:13px;color:var(--mute);margin-right:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #fname{display:none}
 :root[data-theme="dark"]{--bg:#101012;--outer:#050507;--bar:rgba(38,38,42,.78);--ink:#f2f2f7;--mute:#9a9aa1;--line:rgba(235,235,245,.14);--acc:#0a84ff;--accsoft:rgba(10,132,255,.22);--card:#2c2c2e;--fill:rgba(120,120,128,.26)}
+:root{color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark}}
+:root[data-theme="dark"]{color-scheme:dark}
+select option{background:var(--card);color:var(--ink)}
+select.btn{min-width:78px;cursor:pointer}
+#side:empty{display:none!important}
 /* Kun/tun tugmasi */
 .toggle-cont{--primary:#54a8fc;--light:#d9d9d9;--dark:#121212;--gray:#414344;--second:rgba(84,168,252,.25);position:relative;z-index:10;width:fit-content;height:50px;border-radius:9999px;zoom:.5;margin:0 10px 0 auto}
 .toggle-cont .toggle-input{display:none}
@@ -214,7 +220,7 @@ function size(){const v=base;const sw=(rot%180)?v.height:v.width,sh=(rot%180)?v.
 
 function build(){
   gen++;if(io)io.disconnect();pagesEl.innerHTML='';
-  const [w,h]=size();zs.value=nearest();
+  const [w,h]=size();setZoomLabel();
   io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)render(e.target)}),{root:view,rootMargin:'600px 0px'});
   for(let i=1;i<=pdf.numPages;i++){
     const d=document.createElement('div');d.className='page';d.dataset.n=i;d.style.width=w+'px';d.style.height=h+'px';
@@ -383,6 +389,13 @@ $('d-r').onclick=closeDoc;$('d-y').onclick=()=>$('tg').click();$('d-g').onclick=
   const apply=()=>{document.documentElement.dataset.theme=t.checked?'light':'dark'};
   t.checked=!mq.matches;apply();t.onchange=apply;
 })();
+function setZoomLabel(){
+  let c=zs.querySelector('[data-c]');const n=nearest();
+  if(n!==''){if(c)c.remove();zs.value=n;return}
+  if(!c){c=document.createElement('option');c.dataset.c=1;zs.prepend(c)}
+  c.value=scale;c.textContent=Math.round(scale*100)+'%';zs.value=scale;
+}
+setZoomLabel();
 const drop=$('drop');
 ['dragenter','dragover'].forEach(t=>window.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
 ['dragleave','drop'].forEach(t=>window.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
